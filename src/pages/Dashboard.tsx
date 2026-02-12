@@ -1,166 +1,30 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Plus, TrendingUp, Calendar, DollarSign } from 'lucide-react';
-import { subscriptionApi } from '../services/api';
-import SubscriptionList from '../components/SubscriptionList';
-import AddSubscriptionModal from '../components/AddSubscriptionModal';
-import PlaidLink from '../components/PlaidLink';
-import Analytics from '../components/Analytics';
-import type { Subscription } from '../types';
+import { MetricCard } from '@/components/ui/MetricCard'
+import { useDashboard } from '@/hooks/useDashboard'
+import { formatMoney, formatPercent } from '@/lib/utils'
+import { SalesChart } from '@/components/dashboard/SalesChart'
+import { CategoryChart } from '@/components/dashboard/CategoryChart'
+import { BestSellersTable } from '@/components/dashboard/BestSellersTable'
 
-export default function Dashboard() {
-  const [showAddModal, setShowAddModal] = useState(false);
+export function DashboardPage() {
+  const { summary, salesTrend, categorySales, bestSellers, loading } = useDashboard()
 
-  const { data: subscriptions = [], refetch } = useQuery<Subscription[]>({
-    queryKey: ['subscriptions'],
-    queryFn: subscriptionApi.getAll,
-  });
-
-  const { data: analytics } = useQuery({
-    queryKey: ['analytics'],
-    queryFn: subscriptionApi.getAnalytics,
-  });
-
-  const totalMonthly = subscriptions
-    .filter((sub) => sub.isActive)
-    .reduce((sum, sub) => {
-      const monthlyAmount =
-        sub.billingCycle === 'yearly'
-          ? sub.amount / 12
-          : sub.billingCycle === 'weekly'
-          ? sub.amount * 4.33
-          : sub.amount;
-      return sum + monthlyAmount;
-    }, 0);
-
-  const totalYearly = totalMonthly * 12;
+  if (loading) return <div>Loading dashboard...</div>
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Track and manage your subscriptions
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <PlaidLink />
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Subscription
-          </button>
-        </div>
+    <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-4">
+        <MetricCard title="Today's Revenue" value={formatMoney(summary.todayRevenue)} />
+        <MetricCard title="Today's Profit" value={formatMoney(summary.todayProfit)} hint={`Margin ${formatPercent(summary.margin)}`} />
+        <MetricCard title="Bills Generated" value={String(summary.billCount)} />
+        <MetricCard title="Low Stock Items" value={String(summary.lowStockCount)} hint={summary.lowStockCount > 0 ? 'Action required' : 'Healthy'} />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <DollarSign className="h-6 w-6 text-gray-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Monthly Spend
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    ${totalMonthly.toFixed(2)}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <TrendingUp className="h-6 w-6 text-gray-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Yearly Spend
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    ${totalYearly.toFixed(2)}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Calendar className="h-6 w-6 text-gray-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Active Subscriptions
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {subscriptions.filter((s) => s.isActive).length}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {analytics && (
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <TrendingUp className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Potential Savings
-                    </dt>
-                    <dd className="text-lg font-medium text-green-600">
-                      ${analytics.potentialSavings.toFixed(2)}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SalesChart points={salesTrend} />
+        <CategoryChart points={categorySales} />
       </div>
 
-      {/* Analytics */}
-      {analytics && <Analytics analytics={analytics} />}
-
-      {/* Subscriptions List */}
-      <SubscriptionList
-        subscriptions={subscriptions}
-        onUpdate={refetch}
-      />
-
-      {/* Add Subscription Modal */}
-      {showAddModal && (
-        <AddSubscriptionModal
-          onClose={() => setShowAddModal(false)}
-          onSuccess={() => {
-            setShowAddModal(false);
-            refetch();
-          }}
-        />
-      )}
+      <BestSellersTable rows={bestSellers} />
     </div>
-  );
+  )
 }

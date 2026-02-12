@@ -1,38 +1,108 @@
-import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from './store/authStore';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Layout from './components/Layout';
+import { useEffect } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { Layout } from '@/components/layout/Layout'
+import { LoginPage } from '@/pages/Login'
+import { DashboardPage } from '@/pages/Dashboard'
+import { ProductsPage } from '@/pages/Products'
+import { BillingPage } from '@/pages/Billing'
+import { InvoicePage } from '@/pages/Invoice'
+import { ReportsPage } from '@/pages/Reports'
+import { LowStockPage } from '@/pages/LowStock'
+import { SettingsPage } from '@/pages/Settings'
+import { SetupHealthPage } from '@/pages/SetupHealth'
 
-function App() {
-  const { initialize, isAuthenticated } = useAuthStore();
+export default function App() {
+  const initialize = useAuthStore((s) => s.initialize)
 
   useEffect(() => {
-    initialize();
-  }, []);
+    void initialize()
+  }, [initialize])
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Layout>
-                <Dashboard />
-              </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ProductsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/billing"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <BillingPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ReportsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/low-stock"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <LowStockPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/setup-health"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <SetupHealthPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/invoice/:id"
+        element={
+          <ProtectedRoute>
+            <InvoicePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  )
 }
-
-export default App;
