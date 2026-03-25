@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseConfigError } from '@/lib/supabase'
 
 interface AuthState {
   user: User | null
@@ -19,6 +19,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   initialized: false,
 
   initialize: async () => {
+    if (supabaseConfigError) {
+      set({ user: null, initialized: true })
+      return
+    }
     const { data } = await supabase.auth.getSession()
     set({ user: data.session?.user ?? null, initialized: true })
     supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
@@ -27,6 +31,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signIn: async (email, password) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError)
     set({ loading: true })
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     set({ loading: false })
@@ -34,6 +39,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signUp: async (email, password, fullName) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError)
     set({ loading: true })
     const { error } = await supabase.auth.signUp({
       email,
@@ -47,6 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signInWithGoogle: async () => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError)
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/dashboard` },
@@ -55,6 +62,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signOut: async () => {
+    if (supabaseConfigError) {
+      set({ user: null })
+      return
+    }
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     set({ user: null })
