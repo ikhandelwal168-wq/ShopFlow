@@ -3,11 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --primary: #3b82f6;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --neutral: #6b7280;
+  --app-bg: #eff3f9;
+  --panel: #ffffff;
+  --line: #dfe6f2;
+  --text: #1f2b46;
+  --muted: #6f7f98;
+  --brand: #2f66de;
+  --brand-dark: #081735;
+}
+
+.dark {
+  --app-bg: #070d1a;
+  --panel: #0f172a;
+  --line: #243247;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
 }
 
 @layer base {
@@ -16,54 +26,99 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    margin: 0;
+    background: var(--app-bg);
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Plus Jakarta Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-@layer base {
-  .dark body {
-    @apply bg-slate-950 text-slate-100;
+  * {
+    border-color: var(--line);
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+  }
+
+  .dark input,
+  .dark textarea,
+  .dark select {
+    @apply border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-400;
   }
 
   .dark .bg-white {
     @apply bg-slate-900;
   }
 
-  .dark .bg-slate-50 {
-    @apply bg-slate-950;
+  .dark .text-\[\#1f2b46\] {
+    color: #e2e8f0;
   }
 
-  .dark .bg-slate-100 {
-    @apply bg-slate-800;
+  .dark .text-\[\#6f7f98\] {
+    color: #94a3b8;
   }
 
-  .dark .border-slate-200 {
-    @apply border-slate-700;
+  .dark .text-\[\#394b68\],
+  .dark .text-\[\#34455f\],
+  .dark .text-\[\#4f5f79\],
+  .dark .text-\[\#5f6f88\],
+  .dark .text-\[\#60718b\],
+  .dark .text-\[\#73839d\],
+  .dark .text-\[\#7f8ea7\],
+  .dark .text-\[\#304467\],
+  .dark .text-\[\#2d3953\],
+  .dark .text-\[\#445571\],
+  .dark .text-\[\#455772\],
+  .dark .text-\[\#98a6bc\],
+  .dark .text-\[\#a0aec2\] {
+    color: #cbd5e1;
   }
 
-  .dark .text-slate-900 {
-    @apply text-slate-100;
+  .dark .border-\[\#dfe6f2\] {
+    border-color: #243247;
   }
 
-  .dark .text-slate-800 {
-    @apply text-slate-100;
+  .dark .border-\[\#edf1f7\],
+  .dark .border-\[\#e8edf5\],
+  .dark .border-\[\#d6e0ef\] {
+    border-color: #233247;
   }
 
-  .dark .text-slate-700 {
-    @apply text-slate-200;
+  .dark .bg-\[\#f8fafd\],
+  .dark .bg-\[\#f6f8fc\],
+  .dark .bg-\[\#e6f8ee\] {
+    background-color: #111c31;
+  }
+}
+
+@layer utilities {
+  .app-panel {
+    @apply rounded-[26px] border border-[#dfe6f2] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-slate-700 dark:bg-slate-900;
   }
 
-  .dark .text-slate-600 {
-    @apply text-slate-300;
+  .app-title {
+    @apply text-xl font-bold text-[#1f2b46] md:text-2xl;
   }
 
-  .dark .text-slate-500 {
-    @apply text-slate-400;
+  .app-subtle {
+    @apply text-sm text-[#6f7f98] md:text-base;
   }
 
-  .dark input,
-  .dark select,
-  .dark textarea {
-    @apply border-slate-700 bg-slate-800 text-slate-100 placeholder:text-slate-400;
+  .app-pill {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .device-compact #root {
+    max-width: 420px;
+    margin: 0 auto;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    min-height: 100vh;
   }
 }

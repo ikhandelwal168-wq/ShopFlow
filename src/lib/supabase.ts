@@ -6,11 +6,18 @@ const invalidAnon =
   !supabaseAnonKey ||
   supabaseAnonKey === 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE' ||
   supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY'
+const invalidUrl = !supabaseUrl || !String(supabaseUrl).startsWith('http')
 
-if (!supabaseUrl || invalidAnon) {
-  console.warn(
-    'Supabase config missing/invalid. Set VITE_SUPABASE_URL and a real VITE_SUPABASE_ANON_KEY in .env, then restart dev server.',
-  )
+export const supabaseConfigError =
+  invalidUrl || invalidAnon
+    ? 'Supabase env missing/invalid. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then restart dev server.'
+    : null
+
+if (supabaseConfigError) {
+  console.error(supabaseConfigError)
 }
 
-export const supabase = createClient(supabaseUrl ?? '', invalidAnon ? 'invalid-key' : supabaseAnonKey)
+export const supabase = createClient(
+  invalidUrl ? 'https://invalid.supabase.local' : supabaseUrl,
+  invalidAnon ? 'invalid-key' : supabaseAnonKey,
+)

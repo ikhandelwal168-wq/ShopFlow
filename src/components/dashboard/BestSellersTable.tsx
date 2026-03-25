@@ -1,36 +1,50 @@
-import { Card } from '@/components/ui/Card'
-import type { BestSellerRow } from '@/types/report'
+import { Plus } from 'lucide-react'
 import { formatMoney } from '@/lib/utils'
+import type { BestSellerRow } from '@/types/report'
 
 export function BestSellersTable({ rows }: { rows: BestSellerRow[] }) {
   return (
-    <Card>
-      <h3 className="mb-4 text-sm font-semibold text-slate-800">Best Sellers</h3>
+    <div className="app-panel overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[#e8edf5] px-6 py-5">
+        <h3 className="text-xl font-semibold text-[#1f2b46]">Best Selling Items</h3>
+        <button type="button" className="text-base font-semibold text-[#2f66de]">
+          View All Reports
+        </button>
+      </div>
+
       <div className="overflow-auto">
-        <table className="min-w-full text-sm">
-          <thead className="bg-slate-100 text-slate-700">
+        <table className="min-w-full text-left">
+          <thead className="bg-[#f6f8fc] text-[11px] uppercase tracking-wide text-[#73839d]">
             <tr>
-              <th className="px-3 py-2 text-left">Product</th>
-              <th className="px-3 py-2 text-left">Qty</th>
-              <th className="px-3 py-2 text-left">Revenue</th>
+              <th className="px-6 py-4">Product Name</th>
+              <th className="px-6 py-4">Category</th>
+              <th className="px-6 py-4">Quantity Sold</th>
+              <th className="px-6 py-4">Revenue</th>
+              <th className="px-6 py-4 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {rows.map((row) => (
-              <tr key={row.product_id}>
-                <td className="px-3 py-2">{row.product_name}</td>
-                <td className="px-3 py-2">{row.quantity}</td>
-                <td className="px-3 py-2">{formatMoney(row.revenue)}</td>
+          <tbody>
+            {rows.slice(0, 5).map((row) => (
+              <tr key={row.product_id} className="border-t border-[#edf1f7] bg-white text-[15px] text-[#1f2b46]">
+                <td className="px-6 py-4 font-semibold">{row.product_name}</td>
+                <td className="px-6 py-4 text-[#5f6f88]">-</td>
+                <td className="px-6 py-4">{row.quantity} Units</td>
+                <td className="px-6 py-4 font-semibold text-[#0f9a67]">{formatMoney(row.revenue)}</td>
+                <td className="px-6 py-4 text-right text-[#96a5bf]">
+                  <Plus className="inline-block" size={20} />
+                </td>
               </tr>
             ))}
             {!rows.length ? (
               <tr>
-                <td colSpan={3} className="px-3 py-8 text-center text-slate-500">No sales yet.</td>
+                <td colSpan={5} className="px-6 py-10 text-center text-sm text-[#6f7f98]">
+                  No sales yet.
+                </td>
               </tr>
             ) : null}
           </tbody>
         </table>
       </div>
-    </Card>
+    </div>
   )
 }
